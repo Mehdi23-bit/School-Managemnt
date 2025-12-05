@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+          "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+          "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- JDBC connection dyal MySQL -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/schooldb</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">mahdi2005</property>
+
+        <!-- SQL dialect db hibernate y9dr ykhdm m3a bzaaf ta3 DB mais kola db 3ndha sql dyalha matalan fmysql
+        t9dr dir auto increment mais f postgres hel nah khassk dir serial so had conf katkhli hibernate ykhtar
+        dialect ta3 sql bach ghadi ykhdm bhal ila glti hya rah 3dna logha whda mais bzaaf ta3 lhjat rah bhal hakdak 
+         -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Show SQL had conf dart bach fach hibernate ydir chi requete m3a base de donnes ytl3 lik exactly achno dar 
+        b sql 
+         -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <!-- Auto create/update tables had conf dart bach ila bdlti 3ndk f les entites dyalk chi haja
+        par exemple 3ndk class etudiant 3ndo klchi mais nssiti like classe_id matalan ila zdtih f entite etudian 
+        ach ghadi yw93 f base donnes iwa had conf hya responsable 3la ach ghadi yw93 ila drti update kifma dayrin hna ghadi
+        ghir update tableau f db mais par exemple drti create kola mra ghadi tbdl chi haja les tables l9dam ghadi wtmhaw wssawb
+         whdin jdad fihom les modification li drti  -->
+        <property name="hibernate.hbm2ddl.auto">update</property>
+    </session-factory>
+</hibernate-configuration>

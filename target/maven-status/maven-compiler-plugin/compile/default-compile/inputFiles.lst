@@ -1,1 +1,3 @@
-/home/elmehdi/Desktop/SchoolManagement/src/main/java/org/school/App.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Student.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/App.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/config/HibernateUtil.java

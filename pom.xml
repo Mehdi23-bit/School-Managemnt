@@ -10,7 +10,17 @@
   <build>
     <plugins>
 
-<!--maven plugin -->
+<plugin>
+    <groupId>org.codehaus.mojo</groupId>
+    <artifactId>exec-maven-plugin</artifactId>
+    <version>3.1.0</version>
+    <configuration>
+        <mainClass>org.school.App</mainClass>
+    </configuration>
+</plugin>
+
+
+<!--hada plugin ta3 maven  -->
 <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-compiler-plugin</artifactId>
@@ -20,7 +30,7 @@
                 <target>21</target>
             </configuration>
         </plugin>
-
+<!--hada plugin ta3 javafx  -->
       <plugin>
       <groupId>org.openjfx</groupId>
         <artifactId>javafx-maven-plugin</artifactId>
@@ -33,21 +43,48 @@
     </plugins>
   </build>
   <dependencies>
+  <!--hada dependcy  ta3 junit ghadi nhtajoh l test dyal projet  -->
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    <!--hada dependency  ta3 javafx bach ntl3o GUI n9ya zwina bhalk azine mais hada lcontrols (buttons,text etc..)  -->
+
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>21</version>
     </dependency>
+    <!--hada dependency ta3 javafx fxml bach nkhdmo fxml (fxml format bhalha bhal HTML)  -->
+
     <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-fxml</artifactId>
       <version>21</version>
     </dependency>
+        <!--hada dependency  ta3 hibernate bach n9dro communique m3a db ghir ORM wga3 manhtajo sql-->
+
+     <dependency>
+        <groupId>org.hibernate.orm</groupId>
+        <artifactId>hibernate-core</artifactId>
+        <version>6.2.7.Final</version>
+    </dependency>
+            <!--hada dependency  ghir api li 3lih hibernate tbasa bach yssayhboh bhala glti jpa howa interface mdifini fih kifach hiberate khasso ykhdm fhmti assat-->
+
+    <dependency>
+        <groupId>jakarta.persistence</groupId>
+        <artifactId>jakarta.persistence-api</artifactId>
+        <version>3.1.0</version>
+    </dependency>
+          <!--hada howa jdbc  bach ghadi connecter mn bin code ta3k wbase donnes mysql -->
+<dependency>
+    <groupId>mysql</groupId>
+    <artifactId>mysql-connector-java</artifactId>
+    <version>8.0.33</version>
+</dependency>
+
   </dependencies>
 </project>
