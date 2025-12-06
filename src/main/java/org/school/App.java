@@ -5,52 +5,39 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.cfg.Configuration;
 import org.school.entities.Student;
-
+import org.school.config.HibernateUtil;
 //javafx import
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.stage.Stage;
-import javafx.scene.control.Label;
 
 public class App {
+    private static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 
-//     @Override 
-//     public void start(Stage primaryStage){
-// Label label = new Label("Hello JavaFX");
-// Scene scene = new Scene(label, 400, 300);
-// primaryStage.setScene(scene);
-// primaryStage.setTitle("School Management");
-// primaryStage.show();
-
-//     }
     public static void main(String[] args) {
-        // Hibernate setup
-        
-        SessionFactory factory = new Configuration()
-                .configure()
-                .addAnnotatedClass(Student.class)
-                .buildSessionFactory();
 
-        // Open session
-        Session session = factory.getCurrentSession();
+        // ─────── FIRST TRANSACTION ───────
+        Session session1 = sessionFactory.getCurrentSession();
+        session1.beginTransaction();
 
-        try {
-            // Create a student object
-            Student s = new Student(1, "John Doe");
+        Student s1 = new Student();
 
-            // Start transaction
-            session.beginTransaction();
+        s1.setFirstName("Mehdi");
+        session1.save(s1);
 
-            // Save the student
-            session.save(s);
+        session1.getTransaction().commit();   // ← session1 is now AUTO-CLOSED
 
-            // Commit transaction
-            session.getTransaction().commit();
+        // ─────── SECOND TRANSACTION (new session) ───────
+        Session session2 = sessionFactory.getCurrentSession();  // new one!
+        session2.beginTransaction();
 
-            System.out.println("Student saved successfully!");
-        } finally {
-            factory.close();
-        }
+        Student s2 = new Student();
+        s2.setFirstName("Ahmed");
+        session2.save(s2);
+
+        session2.getTransaction().commit();   // ← session2 closed
+
+        // ─────── If you want to query ───────
        
+
+        // Close factory at the very end
+        sessionFactory.close();
     }
 }

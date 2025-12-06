@@ -1,4 +1,4 @@
 -------------------------------------------------------------------------------
-Test set: org.school.AppTest
+Test set: org.school.entities.AllEntitiesTest
 -------------------------------------------------------------------------------
-Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.073 sec
+Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 13.18 s -- in org.school.entities.AllEntitiesTest

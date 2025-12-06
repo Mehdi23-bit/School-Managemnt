@@ -1,3 +1,9 @@
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Student.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Professor.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Major.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Classe.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Admin.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/App.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Subject.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Note.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/config/HibernateUtil.java
