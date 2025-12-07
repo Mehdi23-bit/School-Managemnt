@@ -1,9 +1,9 @@
 org/school/entities/Professor.class
-org/school/entities/Classe.class
-org/school/entities/Student.class
 org/school/entities/Major.class
 org/school/entities/Note.class
 org/school/App.class
 org/school/entities/Admin.class
 org/school/entities/Subject.class
 org/school/config/HibernateUtil.class
+org/school/entities/Classe.class
+org/school/entities/Student.class

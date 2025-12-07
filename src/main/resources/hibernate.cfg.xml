@@ -33,7 +33,8 @@
         <mapping class="org.school.entities.Classe"/>
         <mapping class="org.school.entities.Subject"/>
         <mapping class="org.school.entities.Professor"/>
-        <mapping class="org.school.entities.Note"/>          <!-- Change if your package is different -->
+        <mapping class="org.school.entities.Note"/>  
+        <mapping class="org.school.entities.Major"/>         <!-- Change if your package is different -->
         <!-- Add other entities here later, example: -->
         <!-- <mapping class="org.school.entity.Classe"/> -->
         <!-- <mapping class="org.school.entity.Professor"/> -->
