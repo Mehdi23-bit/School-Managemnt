@@ -12,7 +12,7 @@
 
 <AnchorPane xmlns="http://javafx.com/javafx/21" 
             xmlns:fx="http://javafx.com/fxml/1" 
-            fx:controller="org.school.AdminDashBoard" 
+            fx:controller="org.school.controllers.AdminDashBoard" 
             prefHeight="700.0" 
             prefWidth="1200.0">
     <children>
