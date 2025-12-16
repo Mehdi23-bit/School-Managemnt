@@ -70,7 +70,6 @@ public class Student extends User {
 
     @Override
     public String toString() {
-        return "Student{id=" + id + ", cne='" + cne + "', username='" + username + 
-               "', name='" + getFullName() + "', active=" + isActive + "}";
+        return this.username;
     }
 }

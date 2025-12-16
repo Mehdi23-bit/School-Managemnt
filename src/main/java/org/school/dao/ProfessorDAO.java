@@ -3,10 +3,12 @@ package org.school.dao;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.query.Query;
+import org.school.entities.Classe;
 import org.school.entities.Professor;
 import org.school.entities.Subject;
 import org.school.config.HibernateUtil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProfessorDAO {
@@ -114,6 +116,17 @@ public class ProfessorDAO {
         }
     }
     
+    public List<Classe> getClassesByProfessor(Long professorId) {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        String hql = "SELECT c FROM Classe c JOIN c.professors p WHERE p.id = :professorId";
+        Query<Classe> query = session.createQuery(hql, Classe.class);
+        query.setParameter("professorId", professorId);
+        return query.list();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return new ArrayList<>();
+    }
+}
     // ==================== UPDATE ====================
     
     public void updateProfessor(Professor professor) {

@@ -463,97 +463,129 @@ public class AdminDashBoard {
     }
     
     @FXML
-    private void onAddProfessor(ActionEvent event) {
-        Dialog<ButtonType> dialog = new Dialog<>();
-        dialog.setTitle("Add New Professor");
-        dialog.setHeaderText("Enter professor information");
+private void onAddProfessor(ActionEvent event) {
+    Dialog<ButtonType> dialog = new Dialog<>();
+    dialog.setTitle("Add New Professor");
+    dialog.setHeaderText("Enter professor information");
+    
+    GridPane grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPadding(new Insets(20, 150, 10, 10));
+    
+    TextField usernameField = new TextField();
+    usernameField.setPromptText("Username");
+    TextField passwordField = new TextField();
+    passwordField.setPromptText("Password");
+    TextField firstNameField = new TextField();
+    firstNameField.setPromptText("First Name");
+    TextField lastNameField = new TextField();
+    lastNameField.setPromptText("Last Name");
+    TextField emailField = new TextField();
+    emailField.setPromptText("Email");
+    
+    ComboBox<Subject> subjectCombo = new ComboBox<>();
+    List<Subject> subjectList = subjectdao.getAllSubjects();
+    subjectCombo.setItems(FXCollections.observableArrayList(subjectList));
+    subjectCombo.setPromptText("Select Subject");
+    
+    subjectCombo.setCellFactory(param -> new ListCell<Subject>() {
+        @Override
+        protected void updateItem(Subject subject, boolean empty) {
+            super.updateItem(subject, empty);
+            setText(empty || subject == null ? null : subject.getName());
+        }
+    });
+    
+    subjectCombo.setButtonCell(new ListCell<Subject>() {
+        @Override
+        protected void updateItem(Subject subject, boolean empty) {
+            super.updateItem(subject, empty);
+            setText(empty || subject == null ? null : subject.getName());
+        }
+    });
+    
+    // Replace ComboBox with ListView for multiple selection
+    ListView<Classe> classListView = new ListView<>();
+    List<Classe> classList = classdao.getAllClasses();
+    classListView.setItems(FXCollections.observableArrayList(classList));
+    classListView.setPrefHeight(100); // Set a reasonable height
+    classListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    
+    // Custom cell factory to display class names
+    classListView.setCellFactory(param -> new ListCell<Classe>() {
+        @Override
+        protected void updateItem(Classe classe, boolean empty) {
+            super.updateItem(classe, empty);
+            setText(empty || classe == null ? null : classe.getName());
+        }
+    });
+    
+    // Add a label to indicate multiple selection is possible
+    Label classLabel = new Label("Classes:");
+    Label classHint = new Label("(Hold Ctrl/Cmd to select multiple)");
+    classHint.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+    
+    grid.add(new Label("Username:"), 0, 0);
+    grid.add(usernameField, 1, 0);
+    grid.add(new Label("Password:"), 0, 1);
+    grid.add(passwordField, 1, 1);
+    grid.add(new Label("First Name:"), 0, 2);
+    grid.add(firstNameField, 1, 2);
+    grid.add(new Label("Last Name:"), 0, 3);
+    grid.add(lastNameField, 1, 3);
+    grid.add(new Label("Email:"), 0, 4);
+    grid.add(emailField, 1, 4);
+    grid.add(new Label("Subject:"), 0, 5);
+    grid.add(subjectCombo, 1, 5);
+    grid.add(classLabel, 0, 6);
+    grid.add(classListView, 1, 6);
+    grid.add(classHint, 1, 7);
+    
+    dialog.getDialogPane().setContent(grid);
+    ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
+    dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
+    
+    Optional<ButtonType> result = dialog.showAndWait();
+    
+    if (result.isPresent() && result.get() == addButton) {
+        if (usernameField.getText().isEmpty() || firstNameField.getText().isEmpty() || 
+            lastNameField.getText().isEmpty() || emailField.getText().isEmpty()) {
+            
+            showError("Missing Information", "Please fill in all required fields!");
+            return;
+        }
         
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(20, 150, 10, 10));
-        
-        TextField usernameField = new TextField();
-        usernameField.setPromptText("Username");
-        TextField passwordField = new TextField();
-        passwordField.setPromptText("Password");
-        TextField firstNameField = new TextField();
-        firstNameField.setPromptText("First Name");
-        TextField lastNameField = new TextField();
-        lastNameField.setPromptText("Last Name");
-        TextField emailField = new TextField();
-        emailField.setPromptText("Email");
-        
-        ComboBox<Subject> subjectCombo = new ComboBox<>();
-        List<Subject> subjectList = subjectdao.getAllSubjects();
-        subjectCombo.setItems(FXCollections.observableArrayList(subjectList));
-        subjectCombo.setPromptText("Select Subject");
-        
-        subjectCombo.setCellFactory(param -> new ListCell<Subject>() {
-            @Override
-            protected void updateItem(Subject subject, boolean empty) {
-                super.updateItem(subject, empty);
-                setText(empty || subject == null ? null : subject.getName());
-            }
-        });
-        
-        subjectCombo.setButtonCell(new ListCell<Subject>() {
-            @Override
-            protected void updateItem(Subject subject, boolean empty) {
-                super.updateItem(subject, empty);
-                setText(empty || subject == null ? null : subject.getName());
-            }
-        });
-        
-        grid.add(new Label("Username:"), 0, 0);
-        grid.add(usernameField, 1, 0);
-        grid.add(new Label("Password:"), 0, 1);
-        grid.add(passwordField, 1, 1);
-        grid.add(new Label("First Name:"), 0, 2);
-        grid.add(firstNameField, 1, 2);
-        grid.add(new Label("Last Name:"), 0, 3);
-        grid.add(lastNameField, 1, 3);
-        grid.add(new Label("Email:"), 0, 4);
-        grid.add(emailField, 1, 4);
-        grid.add(new Label("Subject:"), 0, 5);
-        grid.add(subjectCombo, 1, 5);
-        
-        dialog.getDialogPane().setContent(grid);
-        ButtonType addButton = new ButtonType("Add", ButtonBar.ButtonData.OK_DONE);
-        dialog.getDialogPane().getButtonTypes().addAll(addButton, ButtonType.CANCEL);
-        
-        Optional<ButtonType> result = dialog.showAndWait();
-        
-        if (result.isPresent() && result.get() == addButton) {
-            if (usernameField.getText().isEmpty() || firstNameField.getText().isEmpty() || 
-                lastNameField.getText().isEmpty() || emailField.getText().isEmpty()) {
-                
-                showError("Missing Information", "Please fill in all required fields!");
-                return;
+        try {
+            Professor newProfessor = new Professor(
+                usernameField.getText(),
+                passwordField.getText(),
+                firstNameField.getText(),
+                lastNameField.getText(),
+                emailField.getText(),
+                null
+            );
+            
+            if (subjectCombo.getValue() != null) {
+                newProfessor.setSubject(subjectCombo.getValue());
             }
             
-            try {
-                Professor newProfessor = new Professor(
-                    usernameField.getText(),
-                    passwordField.getText(),
-                    firstNameField.getText(),
-                    lastNameField.getText(),
-                    emailField.getText(),null
-                );
-                
-                if (subjectCombo.getValue() != null) {
-                    newProfessor.setSubject(subjectCombo.getValue());
-                }
-                
-                professorDAO.saveProfessor(newProfessor);
-                loadProfessors();
-                
-                showSuccess("Professor added successfully!");
-            } catch (Exception e) {
-                showError("Error", "Could not add professor: " + e.getMessage());
+            // Get all selected classes from ListView
+            ObservableList<Classe> selectedClasses = classListView.getSelectionModel().getSelectedItems();
+            if (!selectedClasses.isEmpty()) {
+                Set<Classe> classes = new HashSet<>(selectedClasses);
+                newProfessor.setClasses(classes);
             }
+            
+            professorDAO.saveProfessor(newProfessor);
+            loadProfessors();
+            
+            showSuccess("Professor added successfully!");
+        } catch (Exception e) {
+            showError("Error", "Could not add professor: " + e.getMessage());
         }
     }
+}
     
     @FXML
     private void onAddClass(ActionEvent event) {

@@ -72,6 +72,6 @@ public class Classe {
     public Set<Student> getStudents(){return this.students;}
     @Override
     public String toString() {
-        return "Classe{id=" + id + ", name='" + name + "', level='" + level + "', capacity=" + capacity + "}";
+        return this.name;
     }
 }
