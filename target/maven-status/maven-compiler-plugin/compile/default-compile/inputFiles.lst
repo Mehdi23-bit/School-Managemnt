@@ -1,10 +1,14 @@
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Professor.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Classe.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/AdminDashBoard.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/dao/SubjectDAO.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Student.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/dao/ClasseDAO.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/LoginController.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Major.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/session/SessionManager.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/Admin.java
+/home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/dao/MajorDAO.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/dao/StudentDAO.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/entities/User.java
 /home/elmehdi/Desktop/School-Managemnt/src/main/java/org/school/App.java

@@ -1,10 +1,159 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 
-<AnchorPane xmlns:fx="http://javafx.com/fxml" prefWidth="300" prefHeight="200">
+<AnchorPane xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="org.school.AdminDashBoard" 
+            prefHeight="700.0" 
+            prefWidth="1200.0">
     <children>
-        <Label text="Hi" layoutX="130" layoutY="90" style="-fx-font-size: 24px;"/>
+        <TabPane AnchorPane.topAnchor="0.0" 
+                 AnchorPane.bottomAnchor="0.0" 
+                 AnchorPane.leftAnchor="0.0" 
+                 AnchorPane.rightAnchor="0.0">
+            <tabs>
+                
+                <!-- Students Tab -->
+                <Tab text="Students" closable="false">
+                    <content>
+                        <BorderPane style="-fx-padding: 20;">
+                            <top>
+                                <HBox spacing="10" style="-fx-padding: 0 0 15 0;">
+                                    <children>
+                                        <Label text="Students List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                                        <Button fx:id="addStudentBtn" text="Add Student" onAction="#onAddStudent" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                    </children>
+                                </HBox>
+                            </top>
+                            <center>
+                                <TableView fx:id="studentsTable" onMouseClicked="#onStudentClick" prefHeight="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="studentCneCol" text="CNE" prefWidth="100.0"/>
+                                        <TableColumn fx:id="studentFirstNameCol" text="First Name" prefWidth="120.0"/>
+                                        <TableColumn fx:id="studentLastNameCol" text="Last Name" prefWidth="120.0"/>
+                                        <TableColumn fx:id="studentEmailCol" text="Email" prefWidth="180.0"/>
+                                        <TableColumn fx:id="studentPhoneCol" text="Phone" prefWidth="120.0"/>
+                                        <TableColumn fx:id="studentClassCol" text="Class" prefWidth="100.0"/>
+                                        <TableColumn fx:id="studentDobCol" text="Date of Birth" prefWidth="120.0"/>
+                                    </columns>
+                                </TableView>
+                            </center>
+                        </BorderPane>
+                    </content>
+                </Tab>
+
+                <!-- Professors Tab -->
+                <Tab text="Professors" closable="false">
+                    <content>
+                        <BorderPane style="-fx-padding: 20;">
+                            <top>
+                                <HBox spacing="10" style="-fx-padding: 0 0 15 0;">
+                                    <children>
+                                        <Label text="Professors List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                                        <Button fx:id="addProfessorBtn" text="Add Professor" onAction="#onAddProfessor" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                    </children>
+                                </HBox>
+                            </top>
+                            <center>
+                                <TableView fx:id="professorsTable" onMouseClicked="#onProfessorClick" prefHeight="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="profFirstNameCol" text="First Name" prefWidth="150.0"/>
+                                        <TableColumn fx:id="profLastNameCol" text="Last Name" prefWidth="150.0"/>
+                                        <TableColumn fx:id="profEmailCol" text="Email" prefWidth="200.0"/>
+                                        <TableColumn fx:id="profSubjectCol" text="Subject" prefWidth="150.0"/>
+                                    </columns>
+                                </TableView>
+                            </center>
+                        </BorderPane>
+                    </content>
+                </Tab>
+
+                <!-- Classes Tab -->
+                <Tab text="Classes" closable="false">
+                    <content>
+                        <BorderPane style="-fx-padding: 20;">
+                            <top>
+                                <HBox spacing="10" style="-fx-padding: 0 0 15 0;">
+                                    <children>
+                                        <Label text="Classes List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                                        <Button fx:id="addClassBtn" text="Add Class" onAction="#onAddClass" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                    </children>
+                                </HBox>
+                            </top>
+                            <center>
+                                <TableView fx:id="classesTable" onMouseClicked="#onClassClick" prefHeight="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="classNameCol" text="Class Name" prefWidth="200.0"/>
+                                        <TableColumn fx:id="classLevelCol" text="Level" prefWidth="100.0"/>
+                                        <TableColumn fx:id="classCapacityCol" text="Capacity" prefWidth="100.0"/>
+                                        <TableColumn fx:id="classMajorCol" text="Major" prefWidth="200.0"/>
+                                    </columns>
+                                </TableView>
+                            </center>
+                        </BorderPane>
+                    </content>
+                </Tab>
+
+                <!-- Majors Tab -->
+                <Tab text="Majors" closable="false">
+                    <content>
+                        <BorderPane style="-fx-padding: 20;">
+                            <top>
+                                <HBox spacing="10" style="-fx-padding: 0 0 15 0;">
+                                    <children>
+                                        <Label text="Majors List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                                        <Button fx:id="addMajorBtn" text="Add Major" onAction="#onAddMajor" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                    </children>
+                                </HBox>
+                            </top>
+                            <center>
+                                <TableView fx:id="majorsTable" onMouseClicked="#onMajorClick" prefHeight="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="majorCodeCol" text="Code" prefWidth="100.0"/>
+                                        <TableColumn fx:id="majorNameCol" text="Name" prefWidth="200.0"/>
+                                        <TableColumn fx:id="majorDescriptionCol" text="Description" prefWidth="300.0"/>
+                                        <TableColumn fx:id="majorDurationCol" text="Duration (years)" prefWidth="150.0"/>
+                                    </columns>
+                                </TableView>
+                            </center>
+                        </BorderPane>
+                    </content>
+                </Tab>
+
+                <!-- Subjects Tab -->
+                <Tab text="Subjects" closable="false">
+                    <content>
+                        <BorderPane style="-fx-padding: 20;">
+                            <top>
+                                <HBox spacing="10" style="-fx-padding: 0 0 15 0;">
+                                    <children>
+                                        <Label text="Subjects List" style="-fx-font-size: 18px; -fx-font-weight: bold;"/>
+                                        <Button fx:id="addSubjectBtn" text="Add Subject" onAction="#onAddSubject" style="-fx-background-color: #4CAF50; -fx-text-fill: white;"/>
+                                    </children>
+                                </HBox>
+                            </top>
+                            <center>
+                                <TableView fx:id="subjectsTable" onMouseClicked="#onSubjectClick" prefHeight="600.0">
+                                    <columns>
+                                        <TableColumn fx:id="subjectNameCol" text="Subject Name" prefWidth="300.0"/>
+                                        <TableColumn fx:id="subjectCoefficientCol" text="Coefficient" prefWidth="150.0"/>
+                                    </columns>
+                                </TableView>
+                            </center>
+                        </BorderPane>
+                    </content>
+                </Tab>
+
+            </tabs>
+        </TabPane>
     </children>
 </AnchorPane>
