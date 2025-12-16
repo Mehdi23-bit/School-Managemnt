@@ -10,7 +10,7 @@
         <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
         <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/schooldb</property>
         <property name="hibernate.connection.username">root</property>
-        <property name="hibernate.connection.password">mahdi2005</property>
+        <property name="hibernate.connection.password">Oualid2005@</property>
 
         <!-- ==================== Dialect & Settings ==================== -->
         <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
@@ -34,7 +34,9 @@
         <mapping class="org.school.entities.Subject"/>
         <mapping class="org.school.entities.Professor"/>
         <mapping class="org.school.entities.Note"/>  
-        <mapping class="org.school.entities.Major"/>         <!-- Change if your package is different -->
+        <mapping class="org.school.entities.Major"/>   
+        <mapping class="org.school.entities.Report"/> 
+              <!-- Change if your package is different -->
         <!-- Add other entities here later, example: -->
         <!-- <mapping class="org.school.entity.Classe"/> -->
         <!-- <mapping class="org.school.entity.Professor"/> -->
