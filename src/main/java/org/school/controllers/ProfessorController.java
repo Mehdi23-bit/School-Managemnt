@@ -1,22 +1,34 @@
 package org.school.controllers;
 
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import org.school.dao.ProfessorDAO;
-import org.school.dao.NoteDAO;
-import org.school.dao.ReportDAO;
-import org.school.dao.StudentDAO;
-import org.school.entities.*;
-
 import java.util.List;
 import java.util.Optional;
+
+import org.school.dao.NoteDAO;
+import org.school.dao.ProfessorDAO;
+import org.school.dao.ReportDAO;
+import org.school.dao.StudentDAO;
+import org.school.entities.Classe;
+import org.school.entities.Note;
+import org.school.entities.Professor;
+import org.school.entities.Report;
+import org.school.entities.Student;
+import org.school.session.SessionManager;
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.PasswordField;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
 
 public class ProfessorController {
 
@@ -71,12 +83,24 @@ public class ProfessorController {
     // ==================== Current User ====================
     private Professor currentProfessor;
 
-    // ==================== Initialize ====================
-    @FXML
+     @FXML
     public void initialize() {
-        setupLoginPane();
+        // Récupérer le professeur connecté depuis SessionManager
+        currentProfessor = SessionManager.getInstance().getAsProfessor();
+        
+        if (currentProfessor == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No professor logged in!");
+            return;
+        }
+        
         setupExamTypeComboBox();
         setupTableColumns();
+        loadDashboardData();
+        
+        // Setup button actions
+        submitNoteButton.setOnAction(e -> handleSubmitNote());
+        submitReportButton.setOnAction(e -> handleSubmitReport());
+        logoutButton.setOnAction(e -> handleLogout());
     }
 
     private void setupLoginPane() {
