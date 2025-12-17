@@ -130,7 +130,7 @@
                         </columns>
                     </TableView>
                 </VBox>
-            </Tab>
+  1          </Tab>
 
             <!-- ==================== REPORTS TAB ==================== -->
             <Tab fx:id="reportsTab" text="📋 Reports" style="-fx-font-size: 12;">

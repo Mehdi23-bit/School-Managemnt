@@ -13,6 +13,7 @@ import org.school.dao.*;
 import org.school.entities.*;
 import java.time.LocalDate;
 import java.util.*;
+import java.time.LocalDateTime;
 
 public class AdminDashBoard {
     
@@ -22,6 +23,7 @@ public class AdminDashBoard {
     MajorDAO majorDAO = new MajorDAO();
     StudentDAO studentDAO = new StudentDAO();
     ProfessorDAO professorDAO = new ProfessorDAO();
+    ReportDAO reportDAO=new ReportDAO(); 
     
     // ===== Student TableView and Columns =====
     @FXML
@@ -84,7 +86,20 @@ public class AdminDashBoard {
     private TableColumn<Subject, String> subjectNameCol;
     @FXML
     private TableColumn<Subject, Double> subjectCoefficientCol;
-    
+
+    // ===== Subject TableView and Columns =====
+    @FXML
+    private TableView<Report> reportsTable;
+    @FXML
+    private TableColumn<Report, String> reportStudentCol;
+    @FXML
+    private TableColumn<Report, String> reportProfessorCol;
+    @FXML
+    private TableColumn<Report, String> reportTitleCol;
+    @FXML
+    private TableColumn<Report, String> reportStatusCol;
+    @FXML
+    private TableColumn<Report, LocalDateTime> reportCreatedAtCol;
     // ===== Initialize =====
     @FXML
     public void initialize() {
@@ -93,12 +108,14 @@ public class AdminDashBoard {
         setupClassTable();
         setupMajorTable();
         setupSubjectTable();
+        setupReportTable();
         
         loadStudents();
         loadProfessors();
         loadClasses();
         loadMajors();
         loadSubjects();
+        loadReports();
     }
     
     // ===== Setup TableViews =====
@@ -156,6 +173,53 @@ public class AdminDashBoard {
         subjectNameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
         subjectCoefficientCol.setCellValueFactory(new PropertyValueFactory<>("coefficient"));
     }
+    private void setupReportTable() {
+        reportStudentCol.setCellValueFactory(cellData -> {
+            Student student = cellData.getValue().getStudent();
+            return new javafx.beans.property.SimpleStringProperty(
+                student != null ? student.getFullName() : "Unknown"
+            );
+        });
+        
+        reportProfessorCol.setCellValueFactory(cellData -> {
+            Professor professor = cellData.getValue().getProfessor();
+            return new javafx.beans.property.SimpleStringProperty(
+                professor != null ? professor.getFullName() : "Unknown"
+            );
+        });
+        
+        reportTitleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
+        reportStatusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
+        reportCreatedAtCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        
+        // Add custom cell factory for status column to show colors
+        reportStatusCol.setCellFactory(column -> new TableCell<Report, String>() {
+            @Override
+            protected void updateItem(String status, boolean empty) {
+                super.updateItem(status, empty);
+                if (empty || status == null) {
+                    setText(null);
+                    setStyle("");
+                } else {
+                    setText(status);
+                    switch (status) {
+                        case "PENDING":
+                            setStyle("-fx-background-color: #fff3cd; -fx-text-fill: #856404;");
+                            break;
+                        case "REVIEWED":
+                            setStyle("-fx-background-color: #d1ecf1; -fx-text-fill: #0c5460;");
+                            break;
+                        case "RESOLVED":
+                            setStyle("-fx-background-color: #d4edda; -fx-text-fill: #155724;");
+                            break;
+                        default:
+                            setStyle("");
+                    }
+                }
+            }
+        });
+    }
+    
     
     // ===== Load Data Methods =====
     
@@ -208,7 +272,19 @@ public class AdminDashBoard {
             showError("Error Loading Subjects", "Could not load subjects: " + e.getMessage());
         }
     }
-    
+    @FXML
+    private void loadReports() {
+        try {
+            List<Report> reports = reportDAO.getPendingReports();
+            if (reports == null) {
+                reports = new ArrayList<>();
+            }
+            ObservableList<Report> observableList = FXCollections.observableArrayList(reports);
+            reportsTable.setItems(observableList);
+        } catch (Exception e) {
+            showError("Error Loading Reports", "Could not load reports: " + e.getMessage());
+        }
+    }
     // ===== Click Handlers =====
     
     @FXML
@@ -350,7 +426,97 @@ public class AdminDashBoard {
             }
         }
     }
+    @FXML
+private void onReportClick(MouseEvent event) {
+    Report selectedReport = reportsTable.getSelectionModel().getSelectedItem();
     
+    if (selectedReport != null && event.getClickCount() == 1) {
+        showReportDetailsDialog(selectedReport);
+    }
+}
+
+// Add dialog to view and update report
+private void showReportDetailsDialog(Report report) {
+    Dialog<ButtonType> dialog = new Dialog<>();
+    dialog.setTitle("Report Details");
+    dialog.setHeaderText("Report from " + report.getProfessor().getFullName());
+    
+    GridPane grid = new GridPane();
+    grid.setHgap(10);
+    grid.setVgap(10);
+    grid.setPadding(new Insets(20, 150, 10, 10));
+    
+    // Display fields (read-only)
+    Label studentLabel = new Label(report.getStudent().getFullName());
+    Label professorLabel = new Label(report.getProfessor().getFullName());
+    Label titleLabel = new Label(report.getTitle());
+    titleLabel.setWrapText(true);
+    titleLabel.setMaxWidth(300);
+    
+    TextArea contentArea = new TextArea(report.getContent());
+    contentArea.setEditable(false);
+    contentArea.setWrapText(true);
+    contentArea.setPrefRowCount(8);
+    contentArea.setMaxWidth(300);
+    
+    Label createdAtLabel = new Label(report.getCreatedAt().toString());
+    
+    // Status ComboBox (editable)
+    ComboBox<String> statusCombo = new ComboBox<>();
+    statusCombo.getItems().addAll("PENDING", "REVIEWED", "RESOLVED");
+    statusCombo.setValue(report.getStatus());
+    
+    grid.add(new Label("Student:"), 0, 0);
+    grid.add(studentLabel, 1, 0);
+    grid.add(new Label("Professor:"), 0, 1);
+    grid.add(professorLabel, 1, 1);
+    grid.add(new Label("Title:"), 0, 2);
+    grid.add(titleLabel, 1, 2);
+    grid.add(new Label("Content:"), 0, 3);
+    grid.add(contentArea, 1, 3);
+    grid.add(new Label("Created At:"), 0, 4);
+    grid.add(createdAtLabel, 1, 4);
+    grid.add(new Label("Status:"), 0, 5);
+    grid.add(statusCombo, 1, 5);
+    
+    dialog.getDialogPane().setContent(grid);
+    
+    ButtonType updateButton = new ButtonType("Update Status", ButtonBar.ButtonData.OK_DONE);
+    ButtonType deleteButton = new ButtonType("Delete Report", ButtonBar.ButtonData.OTHER);
+    dialog.getDialogPane().getButtonTypes().addAll(updateButton, deleteButton, ButtonType.CLOSE);
+    
+    Optional<ButtonType> result = dialog.showAndWait();
+    
+    if (result.isPresent()) {
+        if (result.get() == updateButton) {
+            try {
+                String newStatus = statusCombo.getValue();
+                reportDAO.updateReportStatus(report.getId(), newStatus);
+                loadReports();
+                showSuccess("Report status updated to: " + newStatus);
+            } catch (Exception e) {
+                showError("Error", "Could not update report: " + e.getMessage());
+            }
+        } else if (result.get() == deleteButton) {
+            Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+            confirmAlert.setTitle("Confirm Deletion");
+            confirmAlert.setHeaderText("Delete Report");
+            confirmAlert.setContentText("Are you sure you want to delete this report?");
+            
+            Optional<ButtonType> confirmResult = confirmAlert.showAndWait();
+            if (confirmResult.isPresent() && confirmResult.get() == ButtonType.OK) {
+                try {
+                    reportDAO.deleteReport(report.getId());
+                    loadReports();
+                    showSuccess("Report deleted successfully!");
+                } catch (Exception e) {
+                    showError("Error", "Could not delete report: " + e.getMessage());
+                }
+            }
+        }
+    }
+}
+
     // ===== Add Methods =====
     
     @FXML
@@ -1205,5 +1371,40 @@ private void onAddProfessor(ActionEvent event) {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+  
     }
+    @FXML
+private ComboBox<String> reportFilterCombo;
+
+private void setupReportFilter() {
+    if (reportFilterCombo != null) {
+        reportFilterCombo.getItems().addAll("All Reports", "PENDING", "REVIEWED", "RESOLVED");
+        reportFilterCombo.setValue("All Reports");
+        reportFilterCombo.setOnAction(e -> filterReports());
+    }
+}
+
+private void filterReports() {
+    try {
+        String selectedFilter = reportFilterCombo.getValue();
+        List<Report> reports;
+        
+        if ("All Reports".equals(selectedFilter)) {
+            // You may need to add a getAllReports() method to ReportDAO
+            reports = reportDAO.getPendingReports(); // Modify this
+        } else {
+            // You may need to add this method to ReportDAO
+            reports = reportDAO.getPendingReports(); // Filter by status
+        }
+        
+        if (reports == null) {
+            reports = new ArrayList<>();
+        }
+        
+        ObservableList<Report> observableList = FXCollections.observableArrayList(reports);
+        reportsTable.setItems(observableList);
+    } catch (Exception e) {
+        showError("Error", "Could not filter reports: " + e.getMessage());
+    }
+}
 }

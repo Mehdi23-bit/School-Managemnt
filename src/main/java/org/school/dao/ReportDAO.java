@@ -7,6 +7,7 @@ import org.school.entities.Report;
 import org.school.config.HibernateUtil;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 public class ReportDAO {
@@ -88,7 +89,28 @@ public class ReportDAO {
             return null;
         }
     }
+public List<Report> getAllReports() {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        String hql = "FROM Report ORDER BY createdAt DESC";
+        return session.createQuery(hql, Report.class).list();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return new ArrayList<>();
+    }
+}
 
+// Get reports by status
+public List<Report> getReportsByStatus(String status) {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        String hql = "FROM Report WHERE status = :status ORDER BY createdAt DESC";
+        Query<Report> query = session.createQuery(hql, Report.class);
+        query.setParameter("status", status);
+        return query.list();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return new ArrayList<>();
+    }
+}
     // ==================== UPDATE ====================
     
     public void updateReport(Report report) {
@@ -152,6 +174,28 @@ public class ReportDAO {
     public Long countPendingReports() {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             String hql = "SELECT COUNT(r) FROM Report r WHERE status = 'PENDING'";
+            return session.createQuery(hql, Long.class).uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+    public Long countReportsByStatus(String status) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(r) FROM Report r WHERE status = :status";
+            Query<Long> query = session.createQuery(hql, Long.class);
+            query.setParameter("status", status);
+            return query.uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return 0L;
+        }
+    }
+    
+    // Count total reports
+    public Long countAllReports() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            String hql = "SELECT COUNT(r) FROM Report r";
             return session.createQuery(hql, Long.class).uniqueResult();
         } catch (Exception e) {
             e.printStackTrace();
