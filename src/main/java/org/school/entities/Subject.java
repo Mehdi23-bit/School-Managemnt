@@ -43,6 +43,6 @@ public class Subject  {
 
     @Override
     public String toString() {
-        return "Subject{id=" + id + ", name='" + name + "', coeff=" + coefficient + "}";
+        return this.name;
     }
 }

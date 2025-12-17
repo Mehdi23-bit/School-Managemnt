@@ -1,44 +1,18 @@
 package org.school.controllers;
 
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.VBox;
+import org.school.dao.*;
+import org.school.entities.*;
+import org.school.session.SessionManager;
+
 import java.util.List;
 import java.util.Optional;
 
-import org.school.dao.NoteDAO;
-import org.school.dao.ProfessorDAO;
-import org.school.dao.ReportDAO;
-import org.school.dao.StudentDAO;
-import org.school.entities.Classe;
-import org.school.entities.Note;
-import org.school.entities.Professor;
-import org.school.entities.Report;
-import org.school.entities.Student;
-import org.school.session.SessionManager;
-
-import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.Tab;
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.VBox;
-
 public class ProfessorController {
-
-    // ==================== Login Section ====================
-    @FXML private TextField loginUsernameField;
-    @FXML private PasswordField loginPasswordField;
-    @FXML private Button loginButton;
-    @FXML private Label loginErrorLabel;
-    @FXML private VBox loginPane;
-
+     
     // ==================== Dashboard Section ====================
     @FXML private VBox dashboardPane;
     @FXML private Label welcomeLabel;
@@ -79,11 +53,12 @@ public class ProfessorController {
     private NoteDAO noteDAO = new NoteDAO();
     private ReportDAO reportDAO = new ReportDAO();
     private StudentDAO studentDAO = new StudentDAO();
-
+    private ClasseDAO classedao = new ClasseDAO();
+    
     // ==================== Current User ====================
     private Professor currentProfessor;
 
-     @FXML
+    @FXML
     public void initialize() {
         // Récupérer le professeur connecté depuis SessionManager
         currentProfessor = SessionManager.getInstance().getAsProfessor();
@@ -95,6 +70,7 @@ public class ProfessorController {
         
         setupExamTypeComboBox();
         setupTableColumns();
+        setupComboBoxCellFactories();
         loadDashboardData();
         
         // Setup button actions
@@ -103,8 +79,55 @@ public class ProfessorController {
         logoutButton.setOnAction(e -> handleLogout());
     }
 
-    private void setupLoginPane() {
-        loginButton.setOnAction(e -> handleLogin());
+    // ✅ Configuration des cellFactory pour afficher les noms
+    private void setupComboBoxCellFactories() {
+        // ComboBox pour Classe
+        classComboBox.setCellFactory(param -> new ListCell<Classe>() {
+            @Override
+            protected void updateItem(Classe classe, boolean empty) {
+                super.updateItem(classe, empty);
+                setText(empty || classe == null ? null : classe.getName());
+            }
+        });
+        classComboBox.setButtonCell(new ListCell<Classe>() {
+            @Override
+            protected void updateItem(Classe classe, boolean empty) {
+                super.updateItem(classe, empty);
+                setText(empty || classe == null ? null : classe.getName());
+            }
+        });
+
+        // ComboBox pour Student (Notes)
+        studentComboBox.setCellFactory(param -> new ListCell<Student>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                setText(empty || student == null ? null : student.getFullName());
+            }
+        });
+        studentComboBox.setButtonCell(new ListCell<Student>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                setText(empty || student == null ? null : student.getFullName());
+            }
+        });
+
+        // ComboBox pour Student (Reports)
+        reportStudentComboBox.setCellFactory(param -> new ListCell<Student>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                setText(empty || student == null ? null : student.getFullName());
+            }
+        });
+        reportStudentComboBox.setButtonCell(new ListCell<Student>() {
+            @Override
+            protected void updateItem(Student student, boolean empty) {
+                super.updateItem(student, empty);
+                setText(empty || student == null ? null : student.getFullName());
+            }
+        });
     }
 
     private void setupExamTypeComboBox() {
@@ -112,44 +135,23 @@ public class ProfessorController {
     }
 
     private void setupTableColumns() {
-        // Notes table
-        studentNameColumn.setCellValueFactory(new PropertyValueFactory<>("student"));
+        // Notes table - Afficher le nom complet de l'étudiant
+        studentNameColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getStudent().getFullName()
+            )
+        );
         noteValueColumn.setCellValueFactory(new PropertyValueFactory<>("value"));
         examTypeColumn.setCellValueFactory(new PropertyValueFactory<>("examType"));
 
-        // Reports table
-        reportStudentColumn.setCellValueFactory(new PropertyValueFactory<>("student"));
+        // Reports table - Afficher le nom complet de l'étudiant
+        reportStudentColumn.setCellValueFactory(cellData -> 
+            new javafx.beans.property.SimpleStringProperty(
+                cellData.getValue().getStudent().getFullName()
+            )
+        );
         reportTitleColumn.setCellValueFactory(new PropertyValueFactory<>("title"));
         reportStatusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
-    }
-
-    // ==================== LOGIN ====================
-    @FXML
-    private void handleLogin() {
-        String username = loginUsernameField.getText().trim();
-        String password = loginPasswordField.getText().trim();
-
-        if (username.isEmpty() || password.isEmpty()) {
-            loginErrorLabel.setText("Username and password required!");
-            loginErrorLabel.setStyle("-fx-text-fill: #ff6b6b;");
-            return;
-        }
-
-        currentProfessor = professorDAO.getProfessorByCredentials(username, password);
-
-        if (currentProfessor != null && currentProfessor.isActive()) {
-            showDashboard();
-            loadDashboardData();
-        } else {
-            loginErrorLabel.setText("Invalid credentials or account inactive!");
-            loginErrorLabel.setStyle("-fx-text-fill: #ff6b6b;");
-            loginPasswordField.clear();
-        }
-    }
-
-    private void showDashboard() {
-        loginPane.setVisible(false);
-        dashboardPane.setVisible(true);
     }
 
     // ==================== DASHBOARD SETUP ====================
@@ -164,14 +166,17 @@ public class ProfessorController {
 
         // Setup class combo box listener
         classComboBox.setOnAction(e -> loadStudentsForClass());
+        
+        // Setup student combo box listener
+        studentComboBox.setOnAction(e -> loadNotesForStudent());
+        
+        // Load reports
+        loadReportsForProfessor();
     }
 
     private void loadClassesForProfessor() {
         classComboBox.getItems().clear();
-        List<Classe> classes = professorDAO.getProfessorsByClass(currentProfessor.getId()).stream()
-                .flatMap(p -> p.getClasses().stream())
-                .distinct()
-                .toList();
+        List<Classe> classes = professorDAO.getClassesByProfessor(currentProfessor.getId());
 
         if (classes != null && !classes.isEmpty()) {
             classComboBox.getItems().addAll(classes);
@@ -186,17 +191,58 @@ public class ProfessorController {
         Classe selectedClass = classComboBox.getValue();
         if (selectedClass == null) return;
 
+        System.out.println("Loading students for class: " + selectedClass.getName() + " (ID: " + selectedClass.getId() + ")");
+
         studentComboBox.getItems().clear();
         reportStudentComboBox.getItems().clear();
+        notesTableView.getItems().clear();
 
-        List<Student> students = selectedClass.getStudents().stream().toList();
+        List<Student> students = classedao.getStudentsInClasse(selectedClass.getId());
+        
         if (students != null && !students.isEmpty()) {
+            System.out.println("Students found: " + students.size());
             studentComboBox.getItems().addAll(students);
             reportStudentComboBox.getItems().addAll(students);
+            
+            // Sélectionner le premier étudiant et charger ses notes
+            studentComboBox.getSelectionModel().selectFirst();
+            loadNotesForStudent();
+        } else {
+            System.out.println("No students found for this class");
         }
     }
 
     // ==================== NOTES MANAGEMENT ====================
+    private void loadNotesForStudent() {
+        Student student = studentComboBox.getValue();
+        if (student == null) {
+            notesTableView.getItems().clear();
+            return;
+        }
+
+        notesTableView.getItems().clear();
+        
+        // ✅ Filtrer par étudiant ET matière du professeur UNIQUEMENT
+        Long subjectId = currentProfessor.getSubject().getId();
+        List<Note> notes = noteDAO.getNotesByStudentAndSubject(student.getId(), subjectId);
+        
+        System.out.println("=== LOADING NOTES ===");
+        System.out.println("Professor: " + currentProfessor.getFullName());
+        System.out.println("Professor Subject ID: " + subjectId + " (" + currentProfessor.getSubject().getName() + ")");
+        System.out.println("Student: " + student.getFullName() + " (ID: " + student.getId() + ")");
+        System.out.println("Notes trouvées: " + (notes != null ? notes.size() : 0));
+        
+        if (notes != null) {
+            for (Note note : notes) {
+                System.out.println("  - Grade: " + note.getValue() + ", Exam: " + note.getExamType() + ", Subject: " + note.getSubject().getName());
+            }
+        }
+        
+        if (notes != null && !notes.isEmpty()) {
+            notesTableView.getItems().addAll(notes);
+        }
+    }
+
     @FXML
     private void handleSubmitNote() {
         Student student = studentComboBox.getValue();
@@ -230,17 +276,6 @@ public class ProfessorController {
         } catch (NumberFormatException e) {
             noteStatusLabel.setText("Invalid note value!");
             noteStatusLabel.setStyle("-fx-text-fill: #ff6b6b;");
-        }
-    }
-
-    private void loadNotesForStudent() {
-        Student student = studentComboBox.getValue();
-        if (student == null) return;
-
-        notesTableView.getItems().clear();
-        List<Note> notes = noteDAO.getNotesByStudent(student.getId());
-        if (notes != null && !notes.isEmpty()) {
-            notesTableView.getItems().addAll(notes);
         }
     }
 
@@ -289,12 +324,23 @@ public class ProfessorController {
         Optional<ButtonType> result = showConfirmation("Logout", "Are you sure you want to logout?");
         if (result.isPresent() && result.get() == ButtonType.OK) {
             currentProfessor = null;
-            loginPane.setVisible(true);
             dashboardPane.setVisible(false);
-            loginUsernameField.clear();
-            loginPasswordField.clear();
-            loginErrorLabel.setText("");
+            clearAllFields();
         }
+    }
+
+    private void clearAllFields() {
+        noteValueField.clear();
+        reportTitleField.clear();
+        reportContentArea.clear();
+        classComboBox.getItems().clear();
+        studentComboBox.getItems().clear();
+        reportStudentComboBox.getItems().clear();
+        notesTableView.getItems().clear();
+        reportsTableView.getItems().clear();
+        examTypeComboBox.getSelectionModel().clearSelection();
+        noteStatusLabel.setText("");
+        reportStatusLabel.setText("");
     }
 
     // ==================== UTILITIES ====================

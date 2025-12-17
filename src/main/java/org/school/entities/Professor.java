@@ -72,6 +72,7 @@ public class Professor extends User {
     public void setSubject(Subject subject) { this.subject = subject; }
 
     public Set<Classe> getClasses() { return classes; }
+    public void setClasses(Set<Classe> classes) {  this.classes=classes; }
 
     public LocalDateTime getHiredAt() { return hiredAt; }
 

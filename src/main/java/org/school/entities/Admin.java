@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "admins")  // ← Its own table
+@Table(name = "admins   ")  // ← Its own table
 public class Admin extends User {
 
     @Column(name = "first_name", length = 50, nullable = false)

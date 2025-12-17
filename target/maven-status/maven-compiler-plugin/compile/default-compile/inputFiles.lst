@@ -6,12 +6,16 @@ C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\entities\Rep
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\entities\Major.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\App.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\session\SessionManager.java
+C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\MajorDAO.java
+C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\SubjectDAO.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\entities\Classe.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\controllers\LoginController.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\ProfessorDAO.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\AdminDAO.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\entities\Note.java
+C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\controllers\AdminDashBoard.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\controllers\StudentController.java
+C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\ClasseDAO.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\NoteDAO.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\entities\Professor.java
 C:\Users\hay info\Desktop\School-Managemnt\src\main\java\org\school\dao\ReportDAO.java

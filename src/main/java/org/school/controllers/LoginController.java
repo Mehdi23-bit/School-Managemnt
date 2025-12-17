@@ -1,16 +1,5 @@
 package org.school.controllers;
 
-import java.io.IOException;
-import java.time.LocalDate;
-
-import org.school.dao.AdminDAO;
-import org.school.dao.ProfessorDAO;
-import org.school.dao.StudentDAO;
-import org.school.entities.Admin;
-import org.school.entities.Professor;
-import org.school.entities.Student;
-import org.school.session.SessionManager;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -21,7 +10,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
+import org.school.dao.*;
+import org.school.entities.*;
+import java.io.IOException;
+import java.time.LocalDate;
+import org.school.session.*;;
 public class LoginController {
 
     @FXML private TextField usernameField;
