@@ -136,7 +136,7 @@
                         </VBox>
 
                         <HBox spacing="10">
-                            <Button fx:id="submitAttestationButton" text="📤 Submit Request" style="-fx-font-size: 11; -fx-padding: 8; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;"/>
+                            <Button fx:id="submitAttestationButton" text="📤 Submit Request" onAction="#handleSubmitAttestation" style="-fx-font-size: 11; -fx-padding: 8; -fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;"/>
                             <Label fx:id="attestationStatusLabel" text="" style="-fx-font-size: 11; -fx-text-fill: #27ae60;"/>
                         </HBox>
                     </VBox>

@@ -9,6 +9,7 @@ import javafx.collections.ObservableList;
 import org.school.dao.StudentDAO;
 import org.school.dao.NoteDAO;
 import org.school.dao.ReportDAO;
+import org.school.dao.ClasseDAO;
 import org.school.entities.*;
 
 import java.util.List;
@@ -59,7 +60,7 @@ public class StudentController {
     private StudentDAO studentDAO = new StudentDAO();
     private NoteDAO noteDAO = new NoteDAO();
     private ReportDAO reportDAO = new ReportDAO();
-
+    private ClasseDAO classeDAO = new ClasseDAO();
     // ==================== Current User ====================
     private Student currentStudent;
 
@@ -243,10 +244,16 @@ public class StudentController {
         // Get a professor (or use null if needed for admin)
         // For now, we'll use the first professor from the student's class
         Professor professor = null;
-        if (currentStudent.getClasse() != null && 
-            !currentStudent.getClasse().getProfessors().isEmpty()) {
-            professor = currentStudent.getClasse().getProfessors().iterator().next();
-        }
+
+if (currentStudent.getClasse() != null) {
+    List<Professor> professors =
+        classeDAO.getProfessorsInClasse(currentStudent.getClasse().getId());
+
+    if (professors != null && !professors.isEmpty()) {
+        professor = professors.get(0);
+    }
+}
+
 
         if (professor != null) {
             Report attestationRequest = new Report(currentStudent, professor, title, content);
