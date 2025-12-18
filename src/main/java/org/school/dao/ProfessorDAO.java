@@ -8,6 +8,7 @@ import org.school.entities.Professor;
 import org.school.entities.Subject;
 import org.school.config.HibernateUtil;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -127,6 +128,26 @@ public class ProfessorDAO {
         return new ArrayList<>();
     }
 }
+// Check if a class already has a professor for a specific subject
+// Check if a class already has a professor for a specific subject
+public Professor getProfessorByClasseAndSubject(Long classeId, Long subjectId) {
+    try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        String hql = "SELECT p FROM Professor p " +
+                     "JOIN p.classes c " +
+                     "WHERE c.id = :classeId AND p.subject.id = :subjectId";
+        
+        Query<Professor> query = session.createQuery(hql, Professor.class);
+        query.setParameter("classeId", classeId);
+        query.setParameter("subjectId", subjectId);
+        
+        return query.uniqueResult();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return null;
+    }
+}
+
+
     // ==================== UPDATE ====================
     
     public void updateProfessor(Professor professor) {
@@ -242,4 +263,20 @@ public class ProfessorDAO {
             return false;
         }
     }
+
+    public boolean isSubjectAlreadyTaughtInClasse(Long classeId, Long subjectId, Long excludeProfessorId) {
+        Professor existingProfessor = getProfessorByClasseAndSubject(classeId, subjectId);
+        
+        if (existingProfessor == null) {
+            return false; // No professor teaching this subject in this class
+        }
+        
+        // If we're updating an existing assignment, exclude the current professor
+        if (excludeProfessorId != null && existingProfessor.getId().equals(excludeProfessorId)) {
+            return false;
+        }
+        
+        return true; // Another professor is already teaching this subject
+    }
+    
 }

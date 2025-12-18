@@ -15,17 +15,37 @@ import org.school.entities.*;
 import java.util.List;
 import java.util.Optional;
 
+import org.school.dao.NoteDAO;
+import org.school.dao.ReportDAO;
+import org.school.entities.Note;
+import org.school.entities.Professor;
+import org.school.entities.Report;
+import org.school.entities.Student;
+import org.school.entities.Subject;
+import org.school.session.SessionManager;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.Tab;
+import javafx.scene.control.TabPane;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.stage.Stage;
+
 public class StudentController {
 
-    // ==================== Login Section ====================
-    @FXML private TextField loginUsernameField;
-    @FXML private PasswordField loginPasswordField;
-    @FXML private Button loginButton;
-    @FXML private Label loginErrorLabel;
-    @FXML private VBox loginPane;
-
     // ==================== Dashboard Section ====================
-    @FXML private VBox dashboardPane;
     @FXML private Label welcomeLabel;
     @FXML private Label studentNameLabel;
     @FXML private Label cneLabel;
@@ -57,7 +77,6 @@ public class StudentController {
     @FXML private TableColumn<Report, String> attestationDateColumn;
 
     // ==================== DAOs ====================
-    private StudentDAO studentDAO = new StudentDAO();
     private NoteDAO noteDAO = new NoteDAO();
     private ReportDAO reportDAO = new ReportDAO();
     private ClasseDAO classeDAO = new ClasseDAO();
@@ -67,13 +86,21 @@ public class StudentController {
     // ==================== Initialize ====================
     @FXML
     public void initialize() {
-        setupLoginPane();
+        // Récupérer l'étudiant connecté depuis SessionManager
+        currentStudent = SessionManager.getInstance().getAsStudent();
+        
+        if (currentStudent == null) {
+            showAlert(Alert.AlertType.ERROR, "Error", "No student logged in!");
+            return;
+        }
+        
         setupAttestationTypeComboBox();
         setupTableColumns();
-    }
-
-    private void setupLoginPane() {
-        loginButton.setOnAction(e -> handleLogin());
+        loadDashboardData();
+        
+        // Setup button actions
+        submitAttestationButton.setOnAction(e -> handleSubmitAttestation());
+        logoutButton.setOnAction(e -> handleLogout());
     }
 
     private void setupAttestationTypeComboBox() {
@@ -110,39 +137,10 @@ public class StudentController {
         );
     }
 
-    // ==================== LOGIN ====================
-    @FXML
-    private void handleLogin() {
-        String username = loginUsernameField.getText().trim();
-        String password = loginPasswordField.getText().trim();
-
-        if (username.isEmpty() || password.isEmpty()) {
-            loginErrorLabel.setText("Username and password required!");
-            loginErrorLabel.setStyle("-fx-text-fill: #ff6b6b;");
-            return;
-        }
-
-        currentStudent = studentDAO.getStudentByCredentials(username, password);
-
-        if (currentStudent != null && currentStudent.isActive()) {
-            showDashboard();
-            loadDashboardData();
-        } else {
-            loginErrorLabel.setText("Invalid credentials or account inactive!");
-            loginErrorLabel.setStyle("-fx-text-fill: #ff6b6b;");
-            loginPasswordField.clear();
-        }
-    }
-
-    private void showDashboard() {
-        loginPane.setVisible(false);
-        dashboardPane.setVisible(true);
-    }
-
     // ==================== DASHBOARD SETUP ====================
     private void loadDashboardData() {
         // Set welcome info
-        welcomeLabel.setText("Welcome, Student!");
+        welcomeLabel.setText("Student");
         studentNameLabel.setText(currentStudent.getFullName());
         cneLabel.setText("CNE: " + currentStudent.getCne());
         if (currentStudent.getClasse() != null) {
@@ -241,8 +239,6 @@ public class StudentController {
                         "Request Type: " + attestationType + "\n\n" +
                         "Reason:\n" + reason;
 
-        // Get a professor (or use null if needed for admin)
-        // For now, we'll use the first professor from the student's class
         Professor professor = null;
 
 if (currentStudent.getClasse() != null) {
@@ -274,11 +270,9 @@ if (currentStudent.getClasse() != null) {
     private void loadAttestationRequests() {
         attestationTableView.getItems().clear();
         
-        // Get all reports related to this student
         List<Report> requests = reportDAO.getReportsByStudent(currentStudent.getId());
         
         if (requests != null && !requests.isEmpty()) {
-            // Filter only attestation requests
             requests = requests.stream()
                 .filter(r -> r.getTitle().startsWith("Attestation Request:"))
                 .toList();
@@ -292,12 +286,22 @@ if (currentStudent.getClasse() != null) {
     private void handleLogout() {
         Optional<ButtonType> result = showConfirmation("Logout", "Are you sure you want to logout?");
         if (result.isPresent() && result.get() == ButtonType.OK) {
-            currentStudent = null;
-            loginPane.setVisible(true);
-            dashboardPane.setVisible(false);
-            loginUsernameField.clear();
-            loginPasswordField.clear();
-            loginErrorLabel.setText("");
+            // Déconnecter l'utilisateur
+            SessionManager.getInstance().logout();
+            
+            // Retourner à l'écran de login
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/Login.fxml"));
+                Parent root = loader.load();
+                
+                Stage stage = (Stage) logoutButton.getScene().getWindow();
+                Scene scene = new Scene(root);
+                stage.setScene(scene);
+                stage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Could not return to login page");
+            }
         }
     }
 

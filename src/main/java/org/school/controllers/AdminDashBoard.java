@@ -24,6 +24,15 @@ public class AdminDashBoard {
     StudentDAO studentDAO = new StudentDAO();
     ProfessorDAO professorDAO = new ProfessorDAO();
     ReportDAO reportDAO=new ReportDAO(); 
+    //=========================status
+    @FXML
+   private Label pendingCountLabel;
+   @FXML
+   private Label reviewedCountLabel;
+   @FXML
+   private Label resolvedCountLabel;
+   
+   
     
     // ===== Student TableView and Columns =====
     @FXML
@@ -116,6 +125,10 @@ public class AdminDashBoard {
         loadMajors();
         loadSubjects();
         loadReports();
+        Long pending=reportDAO.countPendingReports();
+        pendingCountLabel.setText(String.valueOf(pending));
+        reviewedCountLabel.setText(String.valueOf(reportDAO.countReportsByStatus("REVIEWED")));
+        resolvedCountLabel.setText(String.valueOf(reportDAO.countReportsByStatus("RESOLVED")));;
     }
     
     // ===== Setup TableViews =====
@@ -671,14 +684,12 @@ private void onAddProfessor(ActionEvent event) {
         }
     });
     
-    // Replace ComboBox with ListView for multiple selection
     ListView<Classe> classListView = new ListView<>();
     List<Classe> classList = classdao.getAllClasses();
     classListView.setItems(FXCollections.observableArrayList(classList));
-    classListView.setPrefHeight(100); // Set a reasonable height
+    classListView.setPrefHeight(100);
     classListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     
-    // Custom cell factory to display class names
     classListView.setCellFactory(param -> new ListCell<Classe>() {
         @Override
         protected void updateItem(Classe classe, boolean empty) {
@@ -687,7 +698,6 @@ private void onAddProfessor(ActionEvent event) {
         }
     });
     
-    // Add a label to indicate multiple selection is possible
     Label classLabel = new Label("Classes:");
     Label classHint = new Label("(Hold Ctrl/Cmd to select multiple)");
     classHint.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
@@ -722,7 +732,45 @@ private void onAddProfessor(ActionEvent event) {
             return;
         }
         
+        if (subjectCombo.getValue() == null) {
+            showError("Missing Information", "Please select a subject!");
+            return;
+        }
+        
         try {
+            Subject selectedSubject = subjectCombo.getValue();
+            ObservableList<Classe> selectedClasses = classListView.getSelectionModel().getSelectedItems();
+            
+            // ✅ VALIDATE: Check for conflicts with existing professors
+            if (!selectedClasses.isEmpty()) {
+                List<String> conflicts = new ArrayList<>();
+                
+                for (Classe classe : selectedClasses) {
+                    if (professorDAO.isSubjectAlreadyTaughtInClasse(classe.getId(), selectedSubject.getId(), null)) {
+                        Professor existingProf = professorDAO.getProfessorByClasseAndSubject(
+                            classe.getId(), 
+                            selectedSubject.getId()
+                        );
+                        conflicts.add("• " + classe.getName() + " → already taught by " + existingProf.getFullName());
+                    }
+                }
+                
+                if (!conflicts.isEmpty()) {
+                    Alert conflictAlert = new Alert(Alert.AlertType.ERROR);
+                    conflictAlert.setTitle("Assignment Conflict");
+                    conflictAlert.setHeaderText("Cannot assign classes - Subject conflicts detected!");
+                    conflictAlert.setContentText(
+                        "The following classes already have a " + selectedSubject.getName() + " professor:\n\n" +
+                        String.join("\n", conflicts) + "\n\n" +
+                        "Each class can only have ONE professor per subject.\n" +
+                        "Please deselect these classes or remove the existing assignments first."
+                    );
+                    conflictAlert.showAndWait();
+                    return;
+                }
+            }
+            
+            // No conflicts - proceed with creation
             Professor newProfessor = new Professor(
                 usernameField.getText(),
                 passwordField.getText(),
@@ -732,12 +780,8 @@ private void onAddProfessor(ActionEvent event) {
                 null
             );
             
-            if (subjectCombo.getValue() != null) {
-                newProfessor.setSubject(subjectCombo.getValue());
-            }
+            newProfessor.setSubject(selectedSubject);
             
-            // Get all selected classes from ListView
-            ObservableList<Classe> selectedClasses = classListView.getSelectionModel().getSelectedItems();
             if (!selectedClasses.isEmpty()) {
                 Set<Classe> classes = new HashSet<>(selectedClasses);
                 newProfessor.setClasses(classes);
@@ -1071,6 +1115,38 @@ private void onAddProfessor(ActionEvent event) {
             }
         });
         
+        // ✅ Add ListView for classes
+        ListView<Classe> classListView = new ListView<>();
+        List<Classe> classList = classdao.getAllClasses();
+        classListView.setItems(FXCollections.observableArrayList(classList));
+        classListView.setPrefHeight(100);
+        classListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+        
+        // ✅ Pre-select current classes
+        List<Classe> currentClasses = professorDAO.getClassesByProfessor(professor.getId());
+        if (currentClasses != null) {
+            for (Classe c : currentClasses) {
+                for (Classe listClasse : classList) {
+                    if (listClasse.getId().equals(c.getId())) {
+                        classListView.getSelectionModel().select(listClasse);
+                        break;
+                    }
+                }
+            }
+        }
+        
+        classListView.setCellFactory(param -> new ListCell<Classe>() {
+            @Override
+            protected void updateItem(Classe classe, boolean empty) {
+                super.updateItem(classe, empty);
+                setText(empty || classe == null ? null : classe.getName());
+            }
+        });
+        
+        Label classLabel = new Label("Classes:");
+        Label classHint = new Label("(Hold Ctrl/Cmd to select multiple)");
+        classHint.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+        
         grid.add(new Label("Username:"), 0, 0);
         grid.add(usernameField, 1, 0);
         grid.add(new Label("Password:"), 0, 1);
@@ -1083,6 +1159,9 @@ private void onAddProfessor(ActionEvent event) {
         grid.add(emailField, 1, 4);
         grid.add(new Label("Subject:"), 0, 5);
         grid.add(subjectCombo, 1, 5);
+        grid.add(classLabel, 0, 6);
+        grid.add(classListView, 1, 6);
+        grid.add(classHint, 1, 7);
         
         dialog.getDialogPane().setContent(grid);
         ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
@@ -1092,12 +1171,59 @@ private void onAddProfessor(ActionEvent event) {
         
         if (result.isPresent() && result.get() == saveButton) {
             try {
+                Subject selectedSubject = subjectCombo.getValue();
+                
+                if (selectedSubject == null) {
+                    showError("Missing Information", "Please select a subject!");
+                    return;
+                }
+                
+                ObservableList<Classe> selectedClasses = classListView.getSelectionModel().getSelectedItems();
+                
+                // ✅ VALIDATE: Check for conflicts (excluding current professor)
+                if (!selectedClasses.isEmpty()) {
+                    List<String> conflicts = new ArrayList<>();
+                    
+                    for (Classe classe : selectedClasses) {
+                        if (professorDAO.isSubjectAlreadyTaughtInClasse(classe.getId(), selectedSubject.getId(), professor.getId())) {
+                            Professor existingProf = professorDAO.getProfessorByClasseAndSubject(
+                                classe.getId(), 
+                                selectedSubject.getId()
+                            );
+                            conflicts.add("• " + classe.getName() + " → already taught by " + existingProf.getFullName());
+                        }
+                    }
+                    
+                    if (!conflicts.isEmpty()) {
+                        Alert conflictAlert = new Alert(Alert.AlertType.ERROR);
+                        conflictAlert.setTitle("Assignment Conflict");
+                        conflictAlert.setHeaderText("Cannot update - Subject conflicts detected!");
+                        conflictAlert.setContentText(
+                            "The following classes already have a " + selectedSubject.getName() + " professor:\n\n" +
+                            String.join("\n", conflicts) + "\n\n" +
+                            "Each class can only have ONE professor per subject.\n" +
+                            "Please deselect these classes or remove the existing assignments first."
+                        );
+                        conflictAlert.showAndWait();
+                        return;
+                    }
+                }
+                
+                // No conflicts - proceed with update
                 professor.setUsername(usernameField.getText());
                 professor.setPassword(passwordField.getText());
                 professor.setFirstName(firstNameField.getText());
                 professor.setLastName(lastNameField.getText());
                 professor.setEmail(emailField.getText());
-                professor.setSubject(subjectCombo.getValue());
+                professor.setSubject(selectedSubject);
+                
+                // Update classes
+                if (!selectedClasses.isEmpty()) {
+                    Set<Classe> classes = new HashSet<>(selectedClasses);
+                    professor.setClasses(classes);
+                } else {
+                    professor.setClasses(new HashSet<>());
+                }
                 
                 professorDAO.updateProfessor(professor);
                 loadProfessors();
