@@ -12,6 +12,8 @@ public class App extends Application {
         Scene scene = new Scene(loader.load(), 400, 250);
         primaryStage.setTitle("JavaFX Login");
         primaryStage.setScene(scene);
+        primaryStage.setMaximized(true);
+
         primaryStage.show();
     }
 

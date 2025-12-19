@@ -1,11 +1,13 @@
 package org.school.controllers;
 
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.Node;
 import org.school.dao.*;
 import org.school.entities.*;
 import org.school.session.SessionManager;
@@ -81,7 +83,7 @@ public class ProfessorController {
         // Setup button actions
         submitNoteButton.setOnAction(e -> handleSubmitNote());
         submitReportButton.setOnAction(e -> handleSubmitReport());
-        logoutButton.setOnAction(e -> handleLogout());
+        // logoutButton.setOnAction(e -> handleLogout());
     }
 
     // ✅ Setup context menu for notes table
@@ -459,12 +461,18 @@ public class ProfessorController {
 
     // ==================== LOGOUT ====================
     @FXML
-    private void handleLogout() {
+    private void handleLogout(ActionEvent event) {
         Optional<ButtonType> result = showConfirmation("Logout", "Are you sure you want to logout?");
         if (result.isPresent() && result.get() == ButtonType.OK) {
             currentProfessor = null;
             dashboardPane.setVisible(false);
             clearAllFields();
+            try {
+                Navigation.logout((Node) event.getSource(),"/fxml/Login.fxml");
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+           
         }
     }
 

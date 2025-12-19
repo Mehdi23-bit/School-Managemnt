@@ -14,6 +14,7 @@ import org.school.entities.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.time.LocalDateTime;
+import javafx.scene.Node;
 
 public class AdminDashBoard {
     
@@ -1533,4 +1534,35 @@ private void filterReports() {
         showError("Error", "Could not filter reports: " + e.getMessage());
     }
 }
+
+//==================on logout=========================
+@FXML
+private void handleLogout(ActionEvent event) {
+    Optional<ButtonType> result = showConfirmation("Logout", "Are you sure you want to logout?");
+    if (result.isPresent() && result.get() == ButtonType.OK) {
+        
+        try {
+            Navigation.logout((Node) event.getSource(),"/fxml/Login.fxml");
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+       
+    }
 }
+//============================ utilities
+private void showAlert(Alert.AlertType type, String title, String message) {
+    Alert alert = new Alert(type);
+    alert.setTitle(title);
+    alert.setContentText(message);
+    alert.showAndWait();
+}
+
+private Optional<ButtonType> showConfirmation(String title, String message) {
+    Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+    alert.setTitle(title);
+    alert.setContentText(message);
+    return alert.showAndWait();
+}
+}
+
+
